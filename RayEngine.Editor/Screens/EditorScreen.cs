@@ -2,10 +2,12 @@ using Raylib_cs;
 using ImGuiNET;
 using System;
 using System.Numerics;
+using System.Collections.Generic;
 
 using static Raylib_cs.Raylib;
 using static Raylib_cs.Color;
 using static Raylib_cs.MaterialMapIndex;
+using static Raylib_cs.KeyboardKey;
 
 namespace RayEngine.Editor
 {
@@ -16,10 +18,12 @@ namespace RayEngine.Editor
 
 		Model testModel;
 
-		const int viewWidth = 640;
-		const int viewHeight = 360;
+		const int viewWidth = 1280;
+		const int viewHeight = 720;
 
 		Vector2 viewMousePos;
+
+		List<string> consoleBuffer;
 
 		private void ViewportDraw()
 		{
@@ -33,7 +37,17 @@ namespace RayEngine.Editor
 
 			EndMode3D();
 
+			DrawLine((int)viewMousePos.X, 0, (int)viewMousePos.X, 720, RED);
+			DrawLine(0, (int)viewMousePos.Y, 1280, (int)viewMousePos.Y, RED);
+
 			DrawText("( " + viewMousePos.X + ", " + viewMousePos.Y + " )", 10, 10, 25, WHITE);
+		}
+
+		private void LogConsole(string text)
+		{
+			string date = DateTime.Now.ToString("[HH:mm:ss] ");
+
+			consoleBuffer.Add(date + text);
 		}
 
 		public unsafe override void Start()
@@ -53,6 +67,10 @@ namespace RayEngine.Editor
 			testModel = LoadModel("Assets/models/church.obj");
 			Texture2D texture = LoadTexture("Assets/models/church_diffuse.png");
 			testModel.materials[0].maps[(int)MATERIAL_MAP_DIFFUSE].texture = texture;
+
+			consoleBuffer = new List<string>();
+
+			MaximizeWindow();
 		}
 
 		public override void Update(float dt)
@@ -104,12 +122,23 @@ namespace RayEngine.Editor
 			if (ImGui.Begin("Viewport"))
 			{
 				Vector2 size = ImGui.GetWindowSize();
-				size.Y -= 10;
+				size.Y -= 40;
+
+				Vector2 pos = ImGui.GetWindowPos();
 
 				float scale = Math.Min((float)size.X / viewWidth, (float)size.Y / viewHeight);
 
-				ImGui.SetCursorPos(new Vector2((size.X - ((float)viewWidth * scale)) * 0.5f, (size.Y - ((float)viewHeight * scale)) * 0.5f));
+				Vector2 cursor = new Vector2((size.X - ((float)viewWidth * scale)) * 0.5f, (size.Y - ((float)viewHeight * scale)) * 0.5f + 30);
+
+				ImGui.SetCursorPos(cursor);
 				ImGui.Image(new IntPtr(viewport.texture.id), new Vector2(viewWidth * scale, viewHeight * scale), new Vector2(0.0f, 2.0f));
+
+				// VIRTUAL MOUSE
+
+				Vector2 realMousePos = GetMousePosition();
+
+				viewMousePos.X = (realMousePos.X - pos.X - (size.X - (viewWidth * scale)) * 0.5f) / scale;
+				viewMousePos.Y = (realMousePos.Y - pos.Y - 30 - (size.Y - (viewHeight * scale)) * 0.5f) / scale;;
 			}
 			ImGui.End();
 
@@ -133,7 +162,15 @@ namespace RayEngine.Editor
 
 			if (ImGui.Begin("Console"))
 			{
+				foreach (string line in consoleBuffer)
+				{
+					ImGui.Spacing();
+					ImGui.Text(line);
+					ImGui.Spacing();
+					ImGui.Separator();
 
+					ImGui.SetScrollY(ImGui.GetScrollMaxY());
+				}
 			}
 			ImGui.End();
 		}
