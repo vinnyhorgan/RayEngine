@@ -16,6 +16,11 @@ namespace RayEngine.Editor
 
 		Model testModel;
 
+		const int viewWidth = 640;
+		const int viewHeight = 360;
+
+		Vector2 viewMousePos;
+
 		private void ViewportDraw()
 		{
 			BeginMode3D(camera);
@@ -27,19 +32,23 @@ namespace RayEngine.Editor
 			DrawModel(testModel, Vector3.Zero, 0.5f, WHITE);
 
 			EndMode3D();
+
+			DrawText("( " + viewMousePos.X + ", " + viewMousePos.Y + " )", 10, 10, 25, WHITE);
 		}
 
 		public unsafe override void Start()
 		{
-			viewport = LoadRenderTexture(640, 480);
+			viewport = LoadRenderTexture(viewWidth, viewHeight);
 
 			camera.position = new Vector3(10.0f, 20.0f, 10.0f);
 			camera.target = new Vector3(0.0f, 5.0f, 0.0f);
-			camera.up = new Vector3(0.0f, -1.0f, 0.0f);
+			camera.up = new Vector3(0.0f, 1.0f, 0.0f);
 			camera.fovy = 45.0f;
 			camera.projection = CameraProjection.CAMERA_PERSPECTIVE;
 
 			SetCameraMode(camera, CameraMode.CAMERA_ORBITAL);
+
+			viewMousePos = new Vector2();
 
 			testModel = LoadModel("Assets/models/church.obj");
 			Texture2D texture = LoadTexture("Assets/models/church_diffuse.png");
@@ -95,9 +104,12 @@ namespace RayEngine.Editor
 			if (ImGui.Begin("Viewport"))
 			{
 				Vector2 size = ImGui.GetWindowSize();
-				size.Y -= 40;
+				size.Y -= 10;
 
-				ImGui.Image(new IntPtr(viewport.texture.id), size);
+				float scale = Math.Min((float)size.X / viewWidth, (float)size.Y / viewHeight);
+
+				ImGui.SetCursorPos(new Vector2((size.X - ((float)viewWidth * scale)) * 0.5f, (size.Y - ((float)viewHeight * scale)) * 0.5f));
+				ImGui.Image(new IntPtr(viewport.texture.id), new Vector2(viewWidth * scale, viewHeight * scale), new Vector2(0.0f, 2.0f));
 			}
 			ImGui.End();
 
