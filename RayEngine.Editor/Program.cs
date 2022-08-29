@@ -29,8 +29,13 @@ namespace RayEngine.Editor
 
 			controller.Load(width, height);
 
-			while (!WindowShouldClose())
+			while (!ScreenManager.exit)
 			{
+				if (WindowShouldClose())
+				{
+					ScreenManager.exit = true;
+				}
+
 				float dt = GetFrameTime();
 
 				manager.current.Update(dt);
