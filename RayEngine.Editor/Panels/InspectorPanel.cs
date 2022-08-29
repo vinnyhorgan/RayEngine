@@ -8,9 +8,15 @@ namespace RayEngine.Editor
 		{
 			if (ScenePanel.current != null)
 			{
-				ScenePanel.current.entities.Add(new Entity());
+				Entity newEntity = new Entity();
+
+				ScenePanel.current.entities.Add(newEntity);
 
 				ScenePanel.current.saved = false;
+
+				current = newEntity;
+
+				AddComponent(new TransformComponent());
 
 				ConsolePanel.Log("Created new entity");
 			}
@@ -18,6 +24,13 @@ namespace RayEngine.Editor
 			{
 				ConsolePanel.Log("No scene selected!");
 			}
+		}
+
+		public void AddComponent(Component component)
+		{
+			current.components.Add(component);
+
+			ScenePanel.current.saved = false;
 		}
 
 		public void Draw()
@@ -30,7 +43,15 @@ namespace RayEngine.Editor
 
 				foreach (Component c in current.components)
 				{
-					ImGui.Text(c.name);
+					switch (c.type)
+					{
+						case ComponentType.Transform:
+							break;
+						case ComponentType.MeshRenderer:
+							break;
+						default:
+							break;
+					}
 				}
 			}
 		}
