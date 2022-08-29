@@ -2,11 +2,6 @@ namespace RayEngine.Editor
 {
 	class Component
 	{
-		public string name;
-
-		public Component()
-		{
-			name = "";
-		}
+		public string name = "";
 	}
 }

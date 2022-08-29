@@ -2,15 +2,8 @@ namespace RayEngine.Editor
 {
 	class Entity
 	{
-		public string name;
+		public string name = Utils.RandomString(5);
 
-		public List<Component> components;
-
-		public Entity()
-		{
-			name = "New Entity";
-
-			components = new List<Component>();
-		}
+		public List<Component> components = new List<Component>();
 	}
 }

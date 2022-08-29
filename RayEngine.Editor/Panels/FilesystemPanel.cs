@@ -3,7 +3,7 @@ namespace RayEngine.Editor
 	class FilesystemPanel
 	{
 		List<string> path = new List<string>();
-		string baseDir = Directory.GetCurrentDirectory() + "/TestProject";
+		public static string baseDir = Directory.GetCurrentDirectory() + "/TestProject";
 
 		public void Draw()
 		{
@@ -47,9 +47,20 @@ namespace RayEngine.Editor
 
 			foreach (string f in files)
 			{
+				string extension = Path.GetExtension(f);
 				string name = new FileInfo(f).Name;
 
-				ImGui.Text(name);
+				if (extension == ".scene")
+				{
+					if (ImGui.Button(name))
+					{
+						ScenePanel.Load(f);
+					}
+				}
+				else
+				{
+					ImGui.Text(name);
+				}
 			}
 		}
 	}

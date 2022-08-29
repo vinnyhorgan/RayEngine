@@ -3,12 +3,14 @@ namespace RayEngine.Editor
 	class EditorScreen : Screen
 	{
 		bool showAbout = false;
+		bool showSettings = false;
 
 		ViewportPanel viewportPanel = new ViewportPanel();
 		ConsolePanel consolePanel = new ConsolePanel();
 		ScenePanel scenePanel = new ScenePanel();
 		InspectorPanel inspectorPanel = new InspectorPanel();
 		FilesystemPanel filesystemPanel = new FilesystemPanel();
+		SettingsPanel settingsPanel = new SettingsPanel();
 
 		public EditorScreen()
 		{
@@ -26,6 +28,11 @@ namespace RayEngine.Editor
 			{
 				if (ImGui.BeginMenu("System"))
 				{
+					if (ImGui.MenuItem("Project Settings"))
+					{
+						showSettings = true;
+					}
+
 					if (ImGui.MenuItem("Quit"))
 					{
 						ScreenManager.exit = true;
@@ -39,6 +46,11 @@ namespace RayEngine.Editor
 					if (ImGui.MenuItem("New"))
 					{
 						scenePanel.New();
+					}
+
+					if (ImGui.MenuItem("Save"))
+					{
+						scenePanel.Save();
 					}
 
 					ImGui.EndMenu();
@@ -84,10 +96,17 @@ namespace RayEngine.Editor
 			}
 			ImGui.End();
 
-			if (ImGui.Begin("Scene"))
+			if (ScenePanel.current != null && ScenePanel.current.saved == false)
 			{
-				scenePanel.Draw();
+				ImGui.Begin("Scene", ImGuiWindowFlags.UnsavedDocument);
 			}
+			else
+			{
+				ImGui.Begin("Scene");
+			}
+
+				scenePanel.Draw();
+
 			ImGui.End();
 
 			if (ImGui.Begin("Inspector"))
@@ -104,11 +123,20 @@ namespace RayEngine.Editor
 
 			if (showAbout == true)
 			{
-				if (ImGui.Begin("About", ref showAbout))
+				if (ImGui.Begin("About", ref showAbout, ImGuiWindowFlags.NoDocking | ImGuiWindowFlags.AlwaysAutoResize))
 				{
 					ImGui.Text("Ray Engine");
 					ImGui.Separator();
 					ImGui.Text("By Vinny Horgan");
+				}
+				ImGui.End();
+			}
+
+			if (showSettings == true)
+			{
+				if (ImGui.Begin("Project Settings", ref showSettings, ImGuiWindowFlags.NoDocking | ImGuiWindowFlags.AlwaysAutoResize))
+				{
+					settingsPanel.Draw();
 				}
 				ImGui.End();
 			}

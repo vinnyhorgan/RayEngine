@@ -10,6 +10,8 @@ namespace RayEngine.Editor
 			{
 				ScenePanel.current.entities.Add(new Entity());
 
+				ScenePanel.current.saved = false;
+
 				ConsolePanel.Log("Created new entity");
 			}
 			else
