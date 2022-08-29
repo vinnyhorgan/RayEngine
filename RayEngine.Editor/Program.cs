@@ -1,11 +1,4 @@
-﻿using Raylib_cs;
-using ImGuiNET;
-using System.Numerics;
-
-using static Raylib_cs.Raylib;
-using static Raylib_cs.Color;
-
-namespace RayEngine.Editor
+﻿namespace RayEngine.Editor
 {
 	class Program
 	{

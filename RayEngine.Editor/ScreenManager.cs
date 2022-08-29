@@ -13,7 +13,6 @@ namespace RayEngine.Editor
 			}
 
 			current = target;
-			current.Start();
 		}
 	}
 }

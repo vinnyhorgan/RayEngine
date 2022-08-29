@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace RayEngine.Editor
 {
 	class Entity
