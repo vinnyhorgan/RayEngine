@@ -33,10 +33,24 @@ namespace RayEngine.Editor
 			string serialized = Utils.Read(path);
 
 			current = JsonConvert.DeserializeObject<Scene>(serialized);
+
+			foreach (Entity e in current.entities)
+			{
+				if (e.components.Contains(ComponentTypes.MeshRenderer))
+				{
+					MeshRendererComponent.LoadMesh(e.meshRenderer, FilesystemPanel.baseDir + "/" + e.meshRenderer.mesh);
+					MeshRendererComponent.LoadMeshTexture(e.meshRenderer, FilesystemPanel.baseDir + "/" + e.meshRenderer.texture);
+				}
+			}
 		}
 
 		public void Draw()
 		{
+			if (IsKeyPressed(KEY_ESCAPE))
+			{
+				ImGui.SetWindowFocus();
+			}
+
 			if (current != null)
 			{
 				ImGui.Text(current.name);

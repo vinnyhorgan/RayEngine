@@ -10,7 +10,8 @@
 			SetTraceLogLevel(TraceLogLevel.LOG_NONE);
 			SetConfigFlags(ConfigFlags.FLAG_MSAA_4X_HINT | ConfigFlags.FLAG_WINDOW_RESIZABLE);
 			InitWindow(width, height, "Ray Engine Editor");
-			SetTargetFPS(60);
+			//SetTargetFPS(60);
+			SetExitKey(KEY_NULL);
 
 			ScreenManager manager = new ScreenManager();
 			manager.change(new EditorScreen());

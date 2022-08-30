@@ -6,6 +6,31 @@ namespace RayEngine.Editor
 		public string texture = "";
 		public bool meshLoaded = false;
 		public bool textureLoaded = false;
+		public bool wireframe = false;
+
+		public static void LoadMesh(MeshRendererComponent c, string meshPath)
+		{
+			if (Path.GetExtension(meshPath) == ".obj")
+			{
+				Model newModel = LoadModel(meshPath);
+
+				InspectorPanel.models.Add(c, newModel);
+
+				c.meshLoaded = true;
+			}
+		}
+
+		public static void LoadMeshTexture(MeshRendererComponent c, string texturePath)
+		{
+			if (Path.GetExtension(texturePath) == ".png")
+			{
+				Texture2D newTexture = LoadTexture(texturePath);
+
+				InspectorPanel.textures.Add(c, newTexture);
+
+				c.textureLoaded = true;
+			}
+		}
 
 		public static void Draw()
 		{
@@ -15,6 +40,7 @@ namespace RayEngine.Editor
 
 			ImGui.InputText("Mesh", ref c.mesh, 100);
 			ImGui.InputText("Texture", ref c.texture, 100);
+			ImGui.Checkbox("Wireframe", ref c.wireframe);
 
 			string meshPath = FilesystemPanel.baseDir + "/" + c.mesh;
 			string texturePath = FilesystemPanel.baseDir + "/" + c.texture;
@@ -33,14 +59,7 @@ namespace RayEngine.Editor
 			}
 			else
 			{
-				if (Path.GetExtension(meshPath) == ".obj")
-				{
-					Model newModel = LoadModel(meshPath);
-
-					InspectorPanel.models.Add(c, newModel);
-
-					c.meshLoaded = true;
-				}
+				LoadMesh(c, meshPath);
 			}
 
 			if (c.textureLoaded)
@@ -57,14 +76,7 @@ namespace RayEngine.Editor
 			}
 			else
 			{
-				if (Path.GetExtension(texturePath) == ".png")
-				{
-					Texture2D newTexture = LoadTexture(texturePath);
-
-					InspectorPanel.textures.Add(c, newTexture);
-
-					c.textureLoaded = true;
-				}
+				LoadMeshTexture(c, texturePath);
 			}
 
 			ImGui.Separator();

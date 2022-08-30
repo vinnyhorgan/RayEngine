@@ -4,6 +4,7 @@ namespace RayEngine.Editor
 	{
 		List<string> path = new List<string>();
 		public static string baseDir = Directory.GetCurrentDirectory() + "/TestProject";
+		public static string projDir = Directory.GetCurrentDirectory();
 
 		public void Draw()
 		{

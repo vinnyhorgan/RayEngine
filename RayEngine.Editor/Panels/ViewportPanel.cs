@@ -10,7 +10,7 @@ namespace RayEngine.Editor
 
 		Vector2 mousePos = new Vector2();
 
-		Model testModel;
+		Model skybox;
 
 		private unsafe void ViewportDraw()
 		{
@@ -18,7 +18,17 @@ namespace RayEngine.Editor
 
 			ClearBackground(DARKBLUE);
 
-			DrawGrid(25, 1.0f);
+			Rlgl.rlDisableBackfaceCulling();
+			Rlgl.rlDisableDepthMask();
+			DrawModel(skybox, new Vector3(0, 0, 0), 1.0f, WHITE);
+			Rlgl.rlEnableBackfaceCulling();
+			Rlgl.rlEnableDepthMask();
+
+			DrawGrid(1000, 1.0f);
+
+			DrawLine3D(new Vector3(-1000, 0, 0), new Vector3(1000, 0, 0), RED);
+			DrawLine3D(new Vector3(0, -1000, 0), new Vector3(0, 1000, 0), GREEN);
+			DrawLine3D(new Vector3(0, 0, -1000), new Vector3(0, 0, 1000), BLUE);
 
 			if (ScenePanel.current != null)
 			{
@@ -27,8 +37,8 @@ namespace RayEngine.Editor
 					if (e.components.Contains(ComponentTypes.Transform))
 					{
 						DrawLine3D(e.transform.position, new Vector3(e.transform.position.X + 2, e.transform.position.Y, e.transform.position.Z), RED);
-						DrawLine3D(e.transform.position, new Vector3(e.transform.position.X, e.transform.position.Y + 2, e.transform.position.Z), BLUE);
-						DrawLine3D(e.transform.position, new Vector3(e.transform.position.X, e.transform.position.Y, e.transform.position.Z + 2), GREEN);
+						DrawLine3D(e.transform.position, new Vector3(e.transform.position.X, e.transform.position.Y + 2, e.transform.position.Z), GREEN);
+						DrawLine3D(e.transform.position, new Vector3(e.transform.position.X, e.transform.position.Y, e.transform.position.Z + 2), BLUE);
 					}
 
 					if (e.components.Contains(ComponentTypes.MeshRenderer))
@@ -47,16 +57,20 @@ namespace RayEngine.Editor
 								model.materials[0] = LoadMaterialDefault();
 							}
 
-							DrawModel(model, e.transform.position, e.transform.scale, WHITE);
+							if (e.meshRenderer.wireframe)
+							{
+								DrawModelWiresEx(model, e.transform.position, e.transform.rotation, e.transform.angle, e.transform.scale, WHITE);
+							}
+							else
+							{
+								DrawModelEx(model, e.transform.position, e.transform.rotation, e.transform.angle, e.transform.scale, WHITE);
+							}
 						}
 					}
 				}
 			}
 
 			EndMode3D();
-
-			DrawLine((int)mousePos.X, 0, (int)mousePos.X, 720, RED);
-			DrawLine(0, (int)mousePos.Y, 1280, (int)mousePos.Y, RED);
 
 			DrawText("( " + (int)mousePos.X + ", " + (int)mousePos.Y + " )", 10, 10, 25, WHITE);
 		}
@@ -65,26 +79,48 @@ namespace RayEngine.Editor
 		{
 			viewport = LoadRenderTexture(width, height);
 
-			camera.position = new Vector3(10.0f, 20.0f, 10.0f);
-			camera.target = new Vector3(0.0f, 5.0f, 0.0f);
+			camera.position = new Vector3(10.0f, 10.0f, 10.0f);
+			camera.target = new Vector3(0.0f, 0.0f, 0.0f);
 			camera.up = new Vector3(0.0f, 1.0f, 0.0f);
 			camera.fovy = 45.0f;
 			camera.projection = CameraProjection.CAMERA_PERSPECTIVE;
 
-			SetCameraMode(camera, CameraMode.CAMERA_ORBITAL);
+			SetCameraMode(camera, CameraMode.CAMERA_FIRST_PERSON);
 
-			testModel = LoadModel("Assets/Models/church.obj");
-			Texture2D texture = LoadTexture("Assets/Models/church_diffuse.png");
-			testModel.materials[0].maps[(int)MATERIAL_MAP_DIFFUSE].texture = texture;
+			// SKYBOX
+
+			Mesh cube = GenMeshCube(1.0f, 1.0f, 1.0f);
+			skybox = LoadModelFromMesh(cube);
+
+			Shader shader = LoadShader(FilesystemPanel.projDir + "/Assets/Shaders/skybox.vs", FilesystemPanel.projDir + "/Assets/Shaders/skybox.fs");
+			SetMaterialShader(ref skybox, 0, ref shader);
+			SetShaderValue(shader, GetShaderLocation(shader, "environmentMap"), (int)MATERIAL_MAP_CUBEMAP, SHADER_UNIFORM_INT);
+
+			Shader shdrCubemap = LoadShader(FilesystemPanel.projDir + "/Assets/Shaders/cubemap.vs", FilesystemPanel.projDir + "/Assets/Shaders/cubemap.fs");
+			SetShaderValue(shdrCubemap, GetShaderLocation(shdrCubemap, "equirectangularMap"), 0, SHADER_UNIFORM_INT);
+
+			string panoFileName = FilesystemPanel.projDir + "/Assets/skybox3.png";
+			Image panorama = LoadImage(panoFileName);
+
+			Texture2D cubemap = LoadTextureCubemap(panorama, CubemapLayout.CUBEMAP_LAYOUT_AUTO_DETECT);
+
+			SetMaterialTexture(ref skybox, 0, MATERIAL_MAP_CUBEMAP, ref cubemap);
+
+			UnloadImage(panorama);
 		}
 
 		public void Update(float dt)
 		{
-			UpdateCamera(ref camera);
+
 		}
 
 		public void Draw()
 		{
+			if (ImGui.IsWindowFocused())
+			{
+				UpdateCamera(ref camera);
+			}
+
 			BeginTextureMode(viewport);
 
 			ViewportDraw();
