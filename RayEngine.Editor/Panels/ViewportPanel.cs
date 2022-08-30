@@ -33,11 +33,19 @@ namespace RayEngine.Editor
 
 					if (e.components.Contains(ComponentTypes.MeshRenderer))
 					{
-						if(e.meshRenderer.meshLoaded == true)
+						if (e.meshRenderer.meshLoaded == true)
 						{
 							Model model = InspectorPanel.models[e.meshRenderer];
 
-							model.materials[0].maps[(int)MATERIAL_MAP_DIFFUSE].texture = LoadTexture(FilesystemPanel.baseDir + "/Assets/church_diffuse.png");
+							if (e.meshRenderer.textureLoaded == true)
+							{
+								Texture2D texture = InspectorPanel.textures[e.meshRenderer];
+								model.materials[0].maps[(int)MATERIAL_MAP_DIFFUSE].texture = texture;
+							}
+							else
+							{
+								model.materials[0] = LoadMaterialDefault();
+							}
 
 							DrawModel(model, e.transform.position, e.transform.scale, WHITE);
 						}

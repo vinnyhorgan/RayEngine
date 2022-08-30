@@ -7,7 +7,7 @@ namespace RayEngine.Editor
 		public bool meshLoaded = false;
 		public bool textureLoaded = false;
 
-		public unsafe static void Draw()
+		public static void Draw()
 		{
 			MeshRendererComponent c = InspectorPanel.current.meshRenderer;
 
@@ -49,10 +49,9 @@ namespace RayEngine.Editor
 				{
 					c.textureLoaded = false;
 
-					if (InspectorPanel.models.ContainsKey(c))
+					if (InspectorPanel.textures.ContainsKey(c))
 					{
-						Model model = InspectorPanel.models[c];
-						model.materials[0].maps[(int)MATERIAL_MAP_DIFFUSE].texture = new Texture2D();
+						InspectorPanel.textures.Remove(c);
 					}
 				}
 			}
@@ -62,8 +61,7 @@ namespace RayEngine.Editor
 				{
 					Texture2D newTexture = LoadTexture(texturePath);
 
-					Model model = InspectorPanel.models[c];
-					model.materials[0].maps[(int)MATERIAL_MAP_DIFFUSE].texture = newTexture;
+					InspectorPanel.textures.Add(c, newTexture);
 
 					c.textureLoaded = true;
 				}

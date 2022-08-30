@@ -11,6 +11,7 @@ namespace RayEngine.Editor
 		public static Entity current;
 
 		public static Dictionary<MeshRendererComponent, Model> models = new Dictionary<MeshRendererComponent, Model>();
+		public static Dictionary<MeshRendererComponent, Texture2D> textures = new Dictionary<MeshRendererComponent, Texture2D>();
 
 		public void New()
 		{
