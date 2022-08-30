@@ -12,7 +12,7 @@ namespace RayEngine.Editor
 
 		Model testModel;
 
-		private void ViewportDraw()
+		private unsafe void ViewportDraw()
 		{
 			BeginMode3D(camera);
 
@@ -36,6 +36,8 @@ namespace RayEngine.Editor
 						if(e.meshRenderer.meshLoaded == true)
 						{
 							Model model = InspectorPanel.models[e.meshRenderer];
+
+							model.materials[0].maps[(int)MATERIAL_MAP_DIFFUSE].texture = LoadTexture(FilesystemPanel.baseDir + "/Assets/church_diffuse.png");
 
 							DrawModel(model, e.transform.position, e.transform.scale, WHITE);
 						}
