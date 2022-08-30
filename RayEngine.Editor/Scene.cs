@@ -2,7 +2,7 @@ namespace RayEngine.Editor
 {
 	class Scene
 	{
-		public string name = Utils.RandomString(5);
+		public string name = GetRandomValue(0, 100000).ToString();
 
 		public List<Entity> entities = new List<Entity>();
 

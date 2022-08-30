@@ -1,8 +1,16 @@
 namespace RayEngine.Editor
 {
+	enum ComponentTypes
+	{
+		Transform,
+		MeshRenderer
+	}
+
 	class InspectorPanel
 	{
 		public static Entity current;
+
+		public static Dictionary<MeshRendererComponent, Model> models = new Dictionary<MeshRendererComponent, Model>();
 
 		public void New()
 		{
@@ -16,7 +24,7 @@ namespace RayEngine.Editor
 
 				current = newEntity;
 
-				AddComponent(new TransformComponent());
+				AddComponent(ComponentTypes.Transform);
 
 				ConsolePanel.Log("Created new entity");
 			}
@@ -26,11 +34,30 @@ namespace RayEngine.Editor
 			}
 		}
 
-		public void AddComponent(Component component)
+		public void AddComponent(ComponentTypes component)
 		{
-			current.components.Add(component);
+			if (current != null)
+			{
+				switch (component)
+				{
+					case ComponentTypes.Transform:
+						current.transform = new TransformComponent();
+						break;
+					case ComponentTypes.MeshRenderer:
+						current.meshRenderer = new MeshRendererComponent();
+						break;
+					default:
+						break;
+				}
 
-			ScenePanel.current.saved = false;
+				current.components.Add(component);
+
+				ScenePanel.current.saved = false;
+			}
+			else
+			{
+				ConsolePanel.Log("No entity selected!");
+			}
 		}
 
 		public void Draw()
@@ -41,13 +68,17 @@ namespace RayEngine.Editor
 
 				ImGui.Separator();
 
-				foreach (Component c in current.components)
+				foreach (ComponentTypes c in current.components)
 				{
-					switch (c.type)
+					switch (c)
 					{
-						case ComponentType.Transform:
+						case ComponentTypes.Transform:
+							TransformComponent.Draw();
+
 							break;
-						case ComponentType.MeshRenderer:
+						case ComponentTypes.MeshRenderer:
+							MeshRendererComponent.Draw();
+
 							break;
 						default:
 							break;

@@ -67,7 +67,7 @@ namespace RayEngine.Editor
 					{
 						if (ImGui.MenuItem("Mesh Renderer"))
 						{
-							inspectorPanel.AddComponent(new MeshRendererComponent());
+							inspectorPanel.AddComponent(ComponentTypes.MeshRenderer);
 						}
 
 						ImGui.EndMenu();

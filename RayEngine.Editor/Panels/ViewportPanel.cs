@@ -20,7 +20,28 @@ namespace RayEngine.Editor
 
 			DrawGrid(25, 1.0f);
 
-			DrawModel(testModel, Vector3.Zero, 1.0f, WHITE);
+			if (ScenePanel.current != null)
+			{
+				foreach (Entity e in ScenePanel.current.entities)
+				{
+					if (e.components.Contains(ComponentTypes.Transform))
+					{
+						DrawLine3D(e.transform.position, new Vector3(e.transform.position.X + 2, e.transform.position.Y, e.transform.position.Z), RED);
+						DrawLine3D(e.transform.position, new Vector3(e.transform.position.X, e.transform.position.Y + 2, e.transform.position.Z), BLUE);
+						DrawLine3D(e.transform.position, new Vector3(e.transform.position.X, e.transform.position.Y, e.transform.position.Z + 2), GREEN);
+					}
+
+					if (e.components.Contains(ComponentTypes.MeshRenderer))
+					{
+						if(e.meshRenderer.meshLoaded == true)
+						{
+							Model model = InspectorPanel.models[e.meshRenderer];
+
+							DrawModel(model, e.transform.position, e.transform.scale, WHITE);
+						}
+					}
+				}
+			}
 
 			EndMode3D();
 

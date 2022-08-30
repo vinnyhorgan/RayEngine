@@ -1,0 +1,1 @@
+{"name":"37035","entities":[{"name":"58260","components":[0,1],"transform":{"position":{"X":0.0,"Y":0.0,"Z":0.0},"rotation":{"X":0.0,"Y":0.0,"Z":0.0},"scale":1.0},"meshRenderer":{"mesh":"Assets/church.obj","texture":"Assets/church_diffuse.png","meshLoaded":true,"textureLoaded":false}}],"saved":true}

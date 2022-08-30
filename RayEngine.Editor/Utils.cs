@@ -21,10 +21,5 @@ namespace RayEngine.Editor
 
 			return text;
 		}
-
-		public static string RandomString(int length)
-		{
-			return string.Join("", Enumerable.Repeat(0, length).Select(n => (char)new Random().Next(127)));
-		}
 	}
 }
