@@ -14,3 +14,5 @@ global using static Raylib_cs.MaterialMapIndex;
 global using static Raylib_cs.KeyboardKey;
 global using static Raylib_cs.MouseButton;
 global using static Raylib_cs.ShaderUniformDataType;
+global using static Raylib_cs.ShaderLocationIndex;
+global using static RayEngine.Editor.Rlights;

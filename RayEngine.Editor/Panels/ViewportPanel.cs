@@ -11,6 +11,11 @@ namespace RayEngine.Editor
 		Vector2 mousePos = new Vector2();
 
 		Model skybox;
+		Shader light;
+		Texture2D bulb;
+		Texture2D sun;
+
+		List<Light> lights = new List<Light>();
 
 		private unsafe void ViewportDraw()
 		{
@@ -47,6 +52,8 @@ namespace RayEngine.Editor
 						{
 							Model model = InspectorPanel.models[e.meshRenderer];
 
+							model.materials[0].shader = light;
+
 							if (e.meshRenderer.textureLoaded == true)
 							{
 								Texture2D texture = InspectorPanel.textures[e.meshRenderer];
@@ -67,6 +74,18 @@ namespace RayEngine.Editor
 							}
 						}
 					}
+				}
+			}
+
+			foreach (Light l in lights)
+			{
+				if (l.type == LightType.LIGHT_POINT)
+				{
+					DrawBillboard(camera, bulb, l.position, 5.0f, WHITE);
+				}
+				else if (l.type == LightType.LIGHT_DIRECTIONAL)
+				{
+					DrawBillboard(camera, sun, l.position, 5.0f, WHITE);
 				}
 			}
 
@@ -107,11 +126,24 @@ namespace RayEngine.Editor
 			SetMaterialTexture(ref skybox, 0, MATERIAL_MAP_CUBEMAP, ref cubemap);
 
 			UnloadImage(panorama);
+
+			light = LoadShader(FilesystemPanel.projDir + "/Assets/Shaders/base_lighting.vs", FilesystemPanel.projDir + "/Assets/Shaders/lighting.fs");
+			light.locs[(int)SHADER_LOC_VECTOR_VIEW] = GetShaderLocation(light, "viewPos");
+
+			int ambientLoc = GetShaderLocation(light, "ambient");
+			float[] ambient = new[] { 0.1f, 0.1f, 0.1f, 1.0f };
+			SetShaderValue(light, ambientLoc, ambient, SHADER_UNIFORM_VEC4);
+
+			lights.Add(CreateLight(lights.Count(), LightType.LIGHT_POINT, new Vector3(10, 10, 10), Vector3.Zero, WHITE, light));
+			lights.Add(CreateLight(lights.Count(), LightType.LIGHT_DIRECTIONAL, new Vector3(-10, 10, -10), Vector3.Zero, WHITE, light));
+
+			bulb = LoadTexture(FilesystemPanel.projDir + "/Assets/bulb.png");
+			sun = LoadTexture(FilesystemPanel.projDir + "/Assets/sun.png");
 		}
 
-		public void Update(float dt)
+		public unsafe void Update(float dt)
 		{
-
+			SetShaderValue(light, light.locs[(int)SHADER_LOC_VECTOR_VIEW], camera.position, SHADER_UNIFORM_VEC3);
 		}
 
 		public void Draw()
